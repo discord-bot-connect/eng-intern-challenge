@@ -62,30 +62,69 @@ for (const [k, v] of Object.entries(textPairs)) {
 function translate(input) {
   // init
   let alphaFound = false;
+  let ans = "";
 
   // input not a multiple of 6, alpha -> braille
   if (input.length % 6 != 0) {
     alphaFound = true;
   } else {
+    //attempt braile -> alpha translate
+
+    let nums = false;
+    let caps = false;
+
     //look 6 chars at a time and see if they are keys in braille
-    for (let i = 0; i < input.length - 6; i++) {
-      //if not then translate: alpha -> braille
+    for (let i = 0; i < input.length; i += 6) {
+      //if attempt fails, switch to alpha -> braille
       if (!brailleToAlpha.has(input.substring(i, i + 6))) {
         alphaFound = true;
         break;
       }
-      i += 6;
+
+      //build ans
+      let curr = brailleToAlpha.get(input.substring(i, i + 6));
+
+      //special cases
+      switch (curr) {
+        case "DECIMAL":
+          ans += ".";
+          continue;
+        case "SPACE":
+          nums = false;
+          ans += " ";
+          continue;
+        case "CAPS":
+          caps = true;
+          continue;
+        case "NUMS":
+          nums = true;
+          continue;
+        // consider > for math only
+        case ">":
+          if (!nums) {
+            ans += "o";
+            continue;
+          }
+          break;
+      }
+
+      //append ans
+      if (nums) {
+        ans += curr.charCodeAt(0) - 96;
+      } else if (caps) {
+        ans += curr.toUpperCase();
+        caps = false;
+      } else {
+        ans += curr;
+      }
     }
   }
-
-  //call the correct translation version
-  alphaFound ? translateAlphaToBraille(input) : translateBrailleToAlpha(input);
+  alphaFound ? translateAlphaToBraille(input) : console.log(ans);
 }
 
 function translateAlphaToBraille(input) {
   let ans = "";
   let nums = false;
-  console.log(input);
 
   for (let i = 0; i < input.length; i++) {
     let curr = input[i];
@@ -122,11 +161,50 @@ function translateAlphaToBraille(input) {
   // ); //Hello world
 
   // console.log(`.....OO.....O.O...OO...........O.OOOO.....O.O...OO....`); // Abc 123
-  // return ans;
 }
 
-function translateBrailleToAlpha(input) {}
+function translateBrailleToAlpha(input) {
+  let ans = "";
+  let nums = false;
+  let caps = false;
+
+  for (let i = 0; i < input.length; i += 6) {
+    let curr = brailleToAlpha.get(input.substring(i, i + 6));
+
+    //consider > as a math symbol since overlap
+    if (!nums && curr == ">") {
+      ans += "o";
+      continue;
+    }
+
+    //flags
+    if (curr == "SPACE") {
+      nums = false;
+      ans += " ";
+      continue;
+    }
+
+    if (curr == "CAPS") {
+      caps = true;
+      continue;
+    }
+
+    if (curr == "NUMS") {
+      nums = true;
+      continue;
+    }
+
+    if (nums) {
+      ans += curr.charCodeAt(0) - 96;
+    } else if (caps) {
+      ans += curr.toUpperCase();
+      caps = false;
+    } else {
+      ans += curr;
+    }
+  }
+
+  console.log(ans);
+}
 
 translate(input);
-// run it
-// translate(input);
