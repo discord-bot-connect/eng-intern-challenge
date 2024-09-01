@@ -69,7 +69,6 @@ function translate(input) {
     alphaFound = true;
   } else {
     //attempt braile -> alpha translate
-
     let nums = false;
     let caps = false;
 
@@ -119,6 +118,7 @@ function translate(input) {
       }
     }
   }
+  //ans is the braille -> alpha version solved above
   alphaFound ? translateAlphaToBraille(input) : console.log(ans);
 }
 
@@ -153,58 +153,8 @@ function translateAlphaToBraille(input) {
       ans += alphaToBraille.get(curr);
     }
   }
-
-  console.log(ans);
-  // console.log(".O.OOOOO.O..O.O..."); // 42
-  // console.log(
-  //   ".....OO.OO..O..O..O.O.O.O.O.O.O..OO........OOO.OO..OO.O.OOO.O.O.O.OO.O.."
-  // ); //Hello world
-
-  // console.log(`.....OO.....O.O...OO...........O.OOOO.....O.O...OO....`); // Abc 123
-}
-
-function translateBrailleToAlpha(input) {
-  let ans = "";
-  let nums = false;
-  let caps = false;
-
-  for (let i = 0; i < input.length; i += 6) {
-    let curr = brailleToAlpha.get(input.substring(i, i + 6));
-
-    //consider > as a math symbol since overlap
-    if (!nums && curr == ">") {
-      ans += "o";
-      continue;
-    }
-
-    //flags
-    if (curr == "SPACE") {
-      nums = false;
-      ans += " ";
-      continue;
-    }
-
-    if (curr == "CAPS") {
-      caps = true;
-      continue;
-    }
-
-    if (curr == "NUMS") {
-      nums = true;
-      continue;
-    }
-
-    if (nums) {
-      ans += curr.charCodeAt(0) - 96;
-    } else if (caps) {
-      ans += curr.toUpperCase();
-      caps = false;
-    } else {
-      ans += curr;
-    }
-  }
-
   console.log(ans);
 }
 
+//run the translation
 translate(input);
